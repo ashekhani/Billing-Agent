@@ -1,0 +1,54 @@
+from mcp.server.fastmcp import FastMCP
+import httpx
+
+mcp = FastMCP("billing-agent")
+
+@mcp.tool()
+async def get_bill_summary(member_id: str) -> str:
+    """Get the billing summary for a member by calling the backend API.
+
+    Args:
+        member_id: The unique ID of the member (e.g. 12345)
+    """
+    # Simulated backend API call (mock data simulating a real API response)
+    mock_api_response = {
+        "12345": {
+            "name": "John Smith",
+            "plan": "Gold PPO",
+            "status": "Active",
+            "claims": 3,
+            "total_billed": "$4,200.00",
+            "total_paid": "$3,800.00",
+            "balance_due": "$400.00",
+            "last_claim": "Claim #C-881 — Partial payment flag detected"
+        },
+        "67890": {
+            "name": "Jane Doe",
+            "plan": "Silver HMO",
+            "status": "Active",
+            "claims": 1,
+            "total_billed": "$1,500.00",
+            "total_paid": "$1,500.00",
+            "balance_due": "$0.00",
+            "last_claim": "Claim #C-774 — Fully paid"
+        }
+    }
+
+    if member_id not in mock_api_response:
+        return f"No billing records found for member ID {member_id}."
+
+    d = mock_api_response[member_id]
+    return f"""
+Member: {d['name']}
+Member ID: {member_id}
+Plan: {d['plan']}
+Status: {d['status']}
+Total Claims: {d['claims']}
+Total Billed: {d['total_billed']}
+Total Paid: {d['total_paid']}
+Balance Due: {d['balance_due']}
+Last Claim: {d['last_claim']}
+"""
+
+if __name__ == "__main__":
+    mcp.run(transport='stdio')
